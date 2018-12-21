@@ -1,0 +1,27 @@
+export
+  append
+, isEmpty
+, length
+, reverse
+
+import file:../Debug as D
+
+
+isEmpty : String -> Bool
+isEmpty s =
+  s == ""
+
+
+length : String -> Int
+length =
+  i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.length"
+
+
+reverse : String -> String
+reverse =
+    i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.reverse"
+
+
+append : String -> String -> String
+append =
+    i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.append"

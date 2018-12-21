@@ -1,0 +1,35 @@
+export suite
+
+import file:../Test/Unit exposing Suite(..)
+import file:./String as S
+
+
+not : Bool -> Bool
+not b =
+  if b then
+    False
+  else
+    True
+
+
+suite =
+  Describe "Data.String"
+  [ Describe "isEmpty"
+    [ Test "blank string is true" <| S.isEmpty ""
+    , Test "non-bank string is not empty" <| not <| S.isEmpty "hello"
+    ]
+  , Describe "length"
+    [ Test "blank string has 0 length" <| S.length "" == 0
+    , Test "5 character string has length 5" <| S.length "hello" == 5
+    ]
+  , Describe "reverse"
+    [ Test "blank string is a blank string" <| S.reverse "" == ""
+    , Test "'stressed' is 'desserts'" <| S.reverse "stressed" == "desserts"
+    ]
+  , Describe "append"
+    [ Test "blank onto a blank" <| S.append "" "" == ""
+    , Test "blank onto a value" <| S.append "hello" "" == "hello"
+    , Test "value onto a blank" <| S.append "" "world" == "world"
+    , Test "value onto a value" <| S.append "hello" "world" == "helloworld"
+    ]
+  ]
