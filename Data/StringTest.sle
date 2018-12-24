@@ -2,6 +2,7 @@ export suite
 
 import file:../Test/Unit exposing Suite(..)
 import file:./String as S
+import file:./Char as C
 import file:../Debug as D
 
 
@@ -180,5 +181,60 @@ suite =
     , Describe "cons"
     [ Test "'a' 'hello'" <| S.cons 'a' "hello" == "ahello"
     , Test "'a' ''" <| S.cons 'a' "" == "a"
+    ]
+    , Describe "uncons"
+    [ Test "''" <| S.uncons "" == Nothing
+    , Test "'a'" <| S.uncons "a" == Just (Tuple 'a' "")
+    , Test "'hello'" <| S.uncons "hello" == Just (Tuple 'h' "ello")
+    ]
+    , Describe "fromList"
+    [ Test "['a', 'e', 'i', 'o', 'u']" <| S.fromList ['a', 'e', 'i', 'o', 'u'] == "aeiou"
+    , Test "[]" <| S.fromList [] == ""
+    ]
+    , Describe "toList"
+    [ Test "'aeiou'" <| S.toList "aeiou" == ['a', 'e', 'i', 'o', 'u']
+    , Test "''" <| S.toList "" == []
+    ]
+    , Describe "fromInt"
+    [ Test "-10" <| S.fromInt (0 - 10) == "-10"
+    , Test "0" <| S.fromInt 0 == "0"
+    , Test "32" <| S.fromInt 32 == "32"
+    ]
+    , Describe "fromChar"
+    [ Test "'a'" <| S.fromChar 'a' == "a"
+    ]
+    , Describe "toInt"
+    [ Test "'-10'" <| S.toInt "-10" == Just (0 - 10)
+    , Test "'0'" <| S.toInt "0" == Just 0
+    , Test "'3.2'" <| S.toInt "3.2" == Nothing
+    , Test "'32b'" <| S.toInt "32b" == Nothing
+    ]
+    , Describe "foldLeft"
+    [ Test "Cons [] 'time'" <| S.foldLeft (\s c -> Cons c s) [] "time" == ['e', 'm', 'i', 't']
+    , Test "Cons [] ''" <| S.foldLeft (\s c -> Cons c s) [] "" == []
+    ]
+    , Describe "foldRight"
+    [ Test "Cons [] 'time'" <| S.foldRight Cons [] "time" == ['t', 'i', 'm', 'e']
+    , Test "Cons [] ''" <| S.foldRight Cons [] "" == []
+    ]
+    , Describe "map"
+    [ Test "(c -> toChar <| 1 + (toInt c)) ''" <| S.map (\c -> C.fromCode <| 1 + (C.toCode c)) "" == ""
+    , Test "(c -> toChar <| 1 + (toInt c)) 'hal'" <| S.map (\c -> C.fromCode <| 1 + (C.toCode c)) "hal" == "ibm"
+    ]
+    , Describe "filter"
+    [ Test "C.isDigit ''" <| S.filter C.isDigit "" == ""
+    , Test "C.isDigit 'R2-D2'" <| S.filter C.isDigit "R2-D2" == "22"
+    ]
+    , Describe "any"
+    [ Test "C.isDigit ''" <| S.any C.isDigit "" == False
+    , Test "C.isDigit '90210'" <| S.any C.isDigit "90210" == True
+    , Test "C.isDigit 'R2-D2'" <| S.any C.isDigit "R2-D2" == True
+    , Test "C.isDigit 'Luke'" <| S.any C.isDigit "Luke" == False
+    ]
+    , Describe "all"
+    [ Test "C.isDigit ''" <| S.all C.isDigit "" == True
+    , Test "C.isDigit '90210'" <| S.all C.isDigit "90210" == True
+    , Test "C.isDigit 'R2-D2'" <| S.all C.isDigit "R2-D2" == False
+    , Test "C.isDigit 'Luke'" <| S.all C.isDigit "Luke" == False
     ]
   ]

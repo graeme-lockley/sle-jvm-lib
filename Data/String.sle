@@ -1,15 +1,24 @@
 export
-  append
+  any
+, all
+, append
 , concat
 , cons
 , contains
 , dropLeft
 , dropRight
 , endsWith
+, filter
+, foldLeft
+, foldRight
+, fromChar
+, fromInt
+, fromList
 , indexes
 , isEmpty
 , join
 , length
+, map
 , pad
 , padLeft
 , padRight
@@ -21,11 +30,14 @@ export
 , startsWith
 , takeLeft
 , takeRight
+, toInt
+, toList
 , toLower
 , toUpper
 , trim
 , trimLeft
 , trimRight
+, uncons
 
 
 import file:./Bitwise
@@ -198,3 +210,63 @@ trimRight =
 cons : Char -> String -> String
 cons =
   i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.cons"
+
+
+uncons : String -> Maybe (Tuple Char String)
+uncons =
+  i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.uncons"
+
+
+fromInt : Int -> String
+fromInt =
+  i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.fromInt"
+
+
+fromChar : Char -> String
+fromChar c =
+  cons c ""
+
+
+toInt : String -> Maybe Int
+toInt =
+  i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.toInt"
+
+
+foldLeft : (a -> Char -> a) -> a -> String -> a
+foldLeft =
+  i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.foldLeft"
+
+
+foldRight : (Char -> a -> a) -> a -> String -> a
+foldRight =
+  i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.foldRight"
+
+
+fromList : List Char -> String
+fromList Nil = ""
+fromList (Cons c cs) = cons c <| fromList cs
+
+
+toList : String -> List Char
+toList =
+  foldRight Cons []
+
+
+map : (Char -> Char) -> String -> String
+map =
+  i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.map"
+
+
+filter : (Char -> Bool) -> String -> String
+filter =
+  i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.filter"
+
+
+any : (Char -> Bool) -> String -> Bool
+any f =
+  foldLeft (\r c -> r || (f c)) False
+
+
+all : (Char -> Bool) -> String -> Bool
+all f =
+    foldLeft (\r c -> r && (f c)) True
