@@ -1,0 +1,26 @@
+export
+  Stream(..)
+, head
+, tail
+, take
+
+
+type Stream a =
+  Stream a (() -> Stream a)
+
+
+head : Stream a -> a
+head (Stream x xs) = x
+
+
+tail : Stream a -> Stream a
+tail (Stream x xs) =
+  xs ()
+
+
+take : Int -> Stream a -> List a
+take n stream =
+  if n < 1 then
+    []
+  else
+    (head stream) :: (take (n - 1) (tail stream))

@@ -1,0 +1,40 @@
+export suite
+
+import file:../Test/Unit exposing Suite(..)
+
+import file:./Stream
+
+
+naturalNumbersFrom : Int -> Stream.Stream Int
+naturalNumbersFrom n =
+  Stream.Stream n (\() -> naturalNumbersFrom (n + 1))
+
+naturalNumbers =
+  naturalNumbersFrom 0
+
+
+nextFibonacci : Int -> Int -> Stream.Stream Int
+nextFibonacci a b =
+  Stream.Stream a (\() -> nextFibonacci b (a + b))
+
+fibonacci =
+  nextFibonacci 0 1
+
+
+suite =
+  Describe "Data.Stream"
+  [ Describe "head"
+    [ Test "naturalNumbers" <| Stream.head naturalNumbers == 0
+    , Test "naturalNumbersFrom 10 " <| Stream.head (naturalNumbersFrom 10) == 10
+    , Test "fibonacci" <| Stream.head fibonacci == 0
+    ]
+  , Describe "tail"
+    [ Test "naturalNumbers" <| (Stream.head <| Stream.tail naturalNumbers) == 1
+    , Test "naturalNumbersFrom 10 " <| (Stream.head <| Stream.tail <| naturalNumbersFrom 10) == 11
+    , Test "fibonacci" <| (Stream.head <| Stream.tail <| Stream.tail <| Stream.tail fibonacci) == 2
+    ]
+  , Describe "take"
+    [ Test "6 naturalNumbers" <| Stream.take 6 naturalNumbers == [0, 1, 2, 3, 4, 5]
+    , Test "6 fibonacci" <| Stream.take 6 fibonacci == [0, 1, 1, 2, 3, 5]
+    ]
+  ]
