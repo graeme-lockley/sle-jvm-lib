@@ -1,6 +1,7 @@
 export
   any
 , all
+, at
 , append
 , concat
 , cons
@@ -51,6 +52,11 @@ isEmpty s =
 length : String -> Int
 length =
   i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.length"
+
+
+at : Int -> String -> Maybe Char
+at =
+  i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.at"
 
 
 reverse : String -> String

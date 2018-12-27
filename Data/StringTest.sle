@@ -24,6 +24,10 @@ suite =
     [ Test "blank string" <| S.length "" == 0
     , Test "5 character string" <| S.length "hello" == 5
     ]
+  , Describe "at"
+    [ Test "2 \"\"" <| S.at 0 "" == Nothing
+    , Test "2 \"hello\"" <| S.at 2 "hello" == Just 'l'
+    ]
   , Describe "reverse"
     [ Test "blank string" <| S.reverse "" == ""
     , Test "\"stressed\"" <| S.reverse "stressed" == "desserts"
