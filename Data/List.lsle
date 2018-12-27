@@ -1,0 +1,82 @@
+= List
+
+This implementation is a classic *CONS* list implementation.  The reason for describing
+this in a literal style is it brings together each list function with its test rather
+than having these elements split over multiple files.
+
+It needs to be noted that this document is for implementors and maintainers of this
+code rather than users of lists.  To aid users of lists, each function will include
+into it's definition comments that will form part of the *SLE* documentation.
+
+
+== Boilerplate
+
+To proceed we need a couple files setup. The first file is the actual list:
+
+
+~~~ Source, file="List.sle"
+import
+  [=Source Imports, separator="\n  , "]
+
+[=Source Functions]
+~~~
+
+The second file is the test file:
+
+~~~ Test, file="ListTest.sle"
+export suite
+
+import file:../Test/Unit exposing Suite(..)
+import file:../Debug as D
+
+import file:./List as List
+
+suite =
+  Describe "Data.List"
+  [ [=Test, separator="\n  ,"]
+  ]
+~~~
+
+
+== List Implementation
+
+The following is the standard -CONS- type:
+
+~~~
+  type List a =
+    Nil
+  , Cons a (List a)
+~~~
+
+This definition is not included into the source file as this exact definition is
+present within the standard prelude.
+
+
+=== singleton
+
+`Singleton comment|Creates a list with only one element.`
+
+~~~ Source Functions ++
+{-| Create a list with only one element:
+    singleton 1234 == [1234]
+    singleton "hi" == ["hi"]
+-}
+singleton : a -> List a
+singleton value =
+  Cons value Nil
+~~~
+
+~~~ SingletonExample
+singleton 1234 == [1234]
+~~~
+
+~~~ SingletonExample
+singleton "hi" == ["hi"]
+~~~
+
+~~~ Test ++
+Describe "singleton"
+  [ [= SingletonExample.map("")]
+
+  ]
+~~~

@@ -1,0 +1,7 @@
+export
+  singleton
+
+
+singleton : a -> List a
+singleton element =
+  Cons element Nil
