@@ -3,6 +3,9 @@ export
 , head
 , tail
 , take
+, unconsWhile
+
+import file:./List
 
 
 type Stream a =
@@ -24,3 +27,16 @@ take n stream =
     []
   else
     (head stream) :: (take (n - 1) (tail stream))
+
+
+unconsWhile : (a -> Bool) -> Stream a -> Tuple (List a) (Stream a)
+unconsWhile f stream =
+  unconsWhileHelper f [] stream
+
+
+unconsWhileHelper : (a -> Bool) -> List a -> Stream a -> Tuple (List a) (Stream a)
+unconsWhileHelper f result (Stream x xs) =
+  if f x then
+    unconsWhileHelper f (x :: result) (xs ())
+  else
+    Tuple (List.reverse result) (Stream x xs)
