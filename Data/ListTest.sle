@@ -8,6 +8,6 @@ suite =
   Describe "Data.List"
   [ Describe "singleton"
     [ Test "1234" <| List.singleton 1234 == [1234]
-    , Test "\"abc\"" <| List.singleton "abs" == ["abc"]
+    , Test "\"abc\"" <| List.singleton "abc" == ["abc"]
     ]
   ]
