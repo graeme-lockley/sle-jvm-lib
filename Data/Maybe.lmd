@@ -1,12 +1,10 @@
 # Maybe
 
-This (simple) library is the solution to Tony Hoare's [Billion Dollar Mistake](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare).
-`Maybe` can help with optional results, error handling and optional arguments.
-
-
-## Definition
+This (simple) library is the solution to Tony Hoare's [Billion Dollar Mistake](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare).  `Maybe` can help with optional results, error handling and optional arguments.
 
 `Maybe` is an ADT with a collection of helper and chaining functions.
+
+## Definition
 
 ```
 type Maybe a
@@ -20,13 +18,11 @@ A value of type `Maybe a` either contains:
 - it is empty represented as `Nothing`
 
 
-## Helper Functions
-
+## Functions
 
 ### <@function name="withDefault"/>
 
-Provide a default value, turning an optional value into a normal value. This comes in handy when paired with functions
-like `String.toInt` and `List.head` which gives back a `Maybe`.
+Provide a default value, turning an optional value into a normal value. This comes in handy when paired with functions like `String.toInt` and `List.head` which gives back a `Maybe`.
 
 ~~~ +SourceFunctions
 withDefault : a -> Maybe a -> a
@@ -34,16 +30,82 @@ withDefault def Nothing = def
 withDefault def (Just value) = value
 ~~~
 
-The implementation is declarative so the following code really provides a couple of running examples to get a feel for
-how to use this function.
+The implementation is declarative so the following code really provides a couple of running examples to get a feel for how to use this function.
 
-~~~ +withDefaultTests
-Test "withDefault 100 (toInt \"42\")" <| withDefault 100 (toInt "42") == 42
+<@example name="withDefault" title="withDefault 100 (toInt \"42\")">
+withDefault 100 (toInt "42") == 42
+</@example>
+
+<@example name="withDefault" title="withDefault 100 (toInt \"42a\")">
+withDefault 100 (toInt "42a") == 100
+</@example>
+
+
+### <@function name="map"/>
+
+Transform a `Maybe` value with a given function.
+
+~~~ +SourceFunctions
+map : (a -> b) -> Maybe a -> Maybe b
+map f Nothing = Nothing
+map f (Just value) = Just <| f value
 ~~~
 
-~~~ +withDefaultTests
-Test "withDefault 100 (toInt \"42a\")" <| withDefault 100 (toInt "42a") == 100
+The implementation is declarative so the following code provides a couple of running examples how this function is used.
+
+<@example name="map" title="map (\\x -> x + x) (toInt \"42\")">
+map (\x -> x + x) (toInt "42") == Just 84
+</@example>
+
+<@example name="map" title="map (\\x -> x + x) (toInt \"42a\")">
+map (\x -> x + x) (toInt "42a") == Nothing
+</@example>
+
+
+### <@function name="andThen"/>
+
+Chain together many computations that may fail. Once one of the computations fail then the remain computations are ignored.
+
+~~~ +SourceFunctions
+andThen : (a -> Maybe b) -> Maybe a -> Maybe b
+andThen f Nothing = Nothing
+andThen f (Just value) = f value
 ~~~
+
+The implementation is extremely simple however it is useful to see how this function can be used to chain computations together.  As illustration consider the use-case where need to parse some input as a month.  
+
+~~~ +TestHelperFunctions
+parseMonth : String -> Maybe Int
+parseMonth userInput =
+    toInt userInput
+      |> andThen toValidMonth
+
+toValidMonth : Int -> Maybe Int
+toValidMonth month =
+    if (1 <= month) && (month <= 12) then
+        Just month
+    else
+        Nothing
+~~~
+
+We can now combine these functions together.  The following shows when the entered text if indeed a valid month - the "8" is converted into an `Int` and then validated as a valid month.
+
+<@example name="andThen" title="parseMonth \"8\"">
+parseMonth "8" == Just 8
+</@example>
+
+
+The second scenario is when the entered value is "20" - in this case the "20" is converted into an `Int` but the valid month validation fails and returns `Nothing`.
+
+<@example name="andThen" title="parseMonth \"20\"">
+parseMonth "20" == Nothing
+</@example>
+
+The final scenario is when the entered value is "12abc" - in this case integer conversion fails and the `toValidMonth` is not called.
+
+<@example name="andThen" title="parseMonth \"12abc\"">
+parseMonth "12abc" == Nothing
+</@example>
 
 
 ## Boilerplate
@@ -67,6 +129,8 @@ export
 import file:../Test/Unit exposing Suite(..)
 import file:./String exposing toInt
 import file:./Maybe exposing [=SourceExports separator=", "]
+
+[=TestHelperFunctions separator="\n\n"]
 
 suite =
   Describe "Data.Maybe"
@@ -92,5 +156,13 @@ Describe "${name}"
 <#macro test name title>
 ~~~ ${name}
 Test "${title}" <| <#nested>
+~~~
+</#macro>
+<#macro example name title>
+~~~ haskell
+<#nested>
+~~~
+~~~ +${name}Tests weave=False
+Test "${title?j_string}" <| <#nested>
 ~~~
 </#macro>
