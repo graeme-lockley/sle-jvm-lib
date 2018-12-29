@@ -1,7 +1,0 @@
-export
-  withDefault
-
-
-withDefault : a -> Maybe a -> a
-withDefault def Nothing = def
-withDefault def (Just x) = x
