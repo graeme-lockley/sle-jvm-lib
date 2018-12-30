@@ -22,7 +22,7 @@ A value of type `Option a` either contains:
 
 ### <@function name="withDefault"/>
 
-Provide a default value, turning an optional value into a normal value. This comes in handy when paired with functions like `String.toInt` and `List.head` which gives back a `Maybe`.
+Provide a default value, turning an optional value into a normal value. This comes in handy when paired with functions like `String.toInt` and `List.head` which returns a `Maybe`.
 
 ~~~ +SourceFunctions
 withDefault : a -> Option a -> a
@@ -72,7 +72,7 @@ andThen f None = None
 andThen f (Some value) = f value
 ~~~
 
-The implementation is extremely simple however it is useful to see how this function can be used to chain computations together.  As illustration consider the use-case where need to parse some input as a month.
+The implementation is extremely simple however it is useful to see how this function can be used.  As illustration consider the use-case to parse some input as a month.
 
 ~~~ +TestHelperFunctions
 parseMonth : String -> Option Int
@@ -110,7 +110,7 @@ parseMonth "12abc" == None
 
 ## Boilerplate
 
-In order to kick off the implementation there is a need for some boilerplate code.  The first is the `Maybe` source code:
+In order to kick off the implementation there is a need for some boilerplate code.  The first is the `Option` source code:
 
 ~~~ Source file="Option.sle"
 export
