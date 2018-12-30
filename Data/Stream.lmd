@@ -1,0 +1,234 @@
+# Stream
+
+A stream is an infinite sequence of elements that can be transformed and collected back into other structures.  A stream is therefore similar to a *cons* list other than it does not have a `Nil` constructor.  Given that SLE is not a lazy language, the second *cons* element is therefore a thunk requiring that the rest of the stream be calculated on demand.
+
+
+## Definition
+
+The following defines the `Stream` ADT.
+
+~~~ +SourceDefinitions
+type Stream a =
+    Stream a (() -> Stream a)
+~~~
+
+~~~ +SourceExports weave=False
+Stream(..)
+~~~
+
+This ADT creates a single constructor `Stream` which has the following signature
+
+~~~ haskell
+Stream :: a -> (() -> Stream a) -> Stream a
+~~~
+
+The first element is therefore the *head* of the stream whilst the second element is a calculation to return the rest of the stream.  Using this constructor it is possible to create a variety of infinite structures.
+
+
+## Constructor Functions
+
+This section describes a collection of useful constructor functions.
+
+
+### <@function name="integers"/>
+
+The `integers` are an infinite stream that begins at 0 and iterates through all of the `Int` values before cycling back to 0 to start over again.  As a sequence it cycles through the following values:
+
+$0, 1, ..., 2^{31} - 2, 2^{31} - 1, -2^{31},-2^{31} + 1, ..., -1, 0, 1, ...$
+
+The original intention was to call this stream `naturalNumbers` but, because the stream is assembled using the builtin `Int`, this proved to be inaccurate.
+
+~~~ +SourceFunctions
+integersFrom : Int -> Stream Int
+integersFrom n =
+  Stream n (\() -> integersFrom (n + 1))
+
+integers =
+  integersFrom 0
+~~~
+
+~~~ +SourceExports weave=False
+integersFrom
+~~~
+
+The following code confirms the value of the first 10 integers.
+
+<@example name="integers" title="take 10 integers">
+take 10 integers == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+</@example>
+
+
+The following code illustrates the roll over where `Int.maximum` is exceeded and the stream automatically flips over to `Int.minimum`.
+
+
+<@example name="integers" title="integersFrom 2147483646 |> take 4">
+(integersFrom 2147483646 |> take 4) == [2147483646, 2147483647, -2147483648, -2147483647]
+</@example>
+
+
+### <@function name="fibonacci"/>
+
+`integers` is initiated from a single value.  It is equally possible to initialise a stream with multiple values.
+
+~~~ +SourceFunctions
+nextFibonacci : Int -> Int -> Stream Int
+nextFibonacci a b =
+  Stream a (\() -> nextFibonacci b (a + b))
+
+fibonacci =
+  nextFibonacci 0 1
+~~~
+
+Technically, using the same rationale used with `integers` could be applied to `fibonacci` in that it'll burst through the `Int` limit of `maximum` and flip to negative values.  For now though this is treated as a known constraint of this sequence.
+
+<@example name="fibonacci" title="take 10 fibonacci">
+take 10 fibonacci == [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+</@example>
+
+
+
+## Functions
+
+
+### <@function name="head"/>
+
+~~~ +SourceFunctions
+head : Stream a -> a
+head (Stream x xs) = x
+~~~
+
+<@example name="head" title="integers">
+head integers == 0
+</@example>
+
+<@example name="head" title="fibonacci">
+head fibonacci == 0
+</@example>
+
+
+### <@function name="tail"/>
+
+~~~ +SourceFunctions
+tail : Stream a -> Stream a
+tail (Stream x xs) =
+  xs ()
+~~~
+
+
+<@example name="tail" title="integers">
+(head <| tail integers) == 1
+</@example>
+
+<@example name="tail" title="fibonacci">
+(head <| tail <| tail <| tail fibonacci) == 2
+</@example>
+
+
+### <@function name="take"/>
+
+~~~ +SourceFunctions
+take : Int -> Stream a -> List a
+take n stream =
+  if n < 1 then
+    []
+  else
+    (head stream) :: (take (n - 1) (tail stream))
+~~~
+
+
+<@example name="take" title="6 integers">
+take 6 integers == [0, 1, 2, 3, 4, 5]
+</@example>
+
+<@example name="take" title="6 fibonacci">
+take 6 fibonacci == [0, 1, 1, 2, 3, 5]
+</@example>
+
+
+### <@function name="unconsWhile"/>
+
+~~~ +SourceFunctions
+unconsWhile : (a -> Bool) -> Stream a -> Tuple (List a) (Stream a)
+unconsWhile f stream =
+  unconsWhileHelper f [] stream
+
+
+unconsWhileHelper : (a -> Bool) -> List a -> Stream a -> Tuple (List a) (Stream a)
+unconsWhileHelper f result (Stream x xs) =
+  if f x then
+    unconsWhileHelper f (x :: result) (xs ())
+  else
+    Tuple (List.reverse result) (Stream x xs)
+~~~
+
+
+<@example name="unconsWhile" title="Tuple.first <| (\\c -> c < 10) fibonacci">
+(T.first <| unconsWhile (\c -> c < 10) fibonacci) == [0, 1, 1, 2, 3, 5, 8]
+</@example>
+
+<@example name="unconsWhile" title="take 5 <| Tuple.second <| (\\c -> c < 10) fibonacci">
+(take 5 <| T.second <| unconsWhile (\c -> c < 10) <| fibonacci) == [13, 21, 34, 55, 89]
+</@example>
+
+
+## Boilerplate
+
+In order to kick off the implementation there is a need for some boilerplate code.  The first is the `Stream` source code:
+
+~~~ Source file="Stream.sle"
+export
+  [=SourceExports separator="\n  , "]
+
+import file:./List
+
+[=SourceDefinitions separator="\n\n"]
+
+[=SourceFunctions separator="\n\n"]
+~~~
+
+The second piece of boilerplate code is to hold all of the unit tests that are composed as part of this definition:
+
+~~~ TestSuite file="StreamTest.sle"
+export
+  suite
+
+import file:../Test/Unit exposing Suite(..)
+import file:./List
+import file:./Tuple as T
+import file:../Debug as D
+import file:./Stream exposing [=SourceExports separator=", "]
+
+suite =
+  Describe "Data.Stream"
+  [ [=Tests separator="\n    , "]
+  ]
+~~~
+
+
+<#macro function name>
+${name}
+
+~~~ +SourceExports weave=False
+${name}
+~~~
+
+~~~ +Tests weave=False
+Describe "${name}"
+    [ [=${name}Tests separator="\n    , "]
+    ]
+~~~
+</#macro>
+
+<#macro test name title>
+~~~ ${name}
+Test "${title}" <| <#nested>
+~~~
+</#macro>
+<#macro example name title>
+~~~ haskell
+<#nested>
+~~~
+~~~ +${name}Tests weave=False
+Test "${title?j_string}" <| <#nested>
+~~~
+</#macro>
