@@ -37,7 +37,7 @@ suite =
     , Test "\"ha\" 0 times" <| S.repeat 0 "ha" == ""
     , Test "\"ha\" once" <| S.repeat 1 "ha" == "ha"
     , Test "\"ha\" 5 times" <| S.repeat 5 "ha" == "hahahahaha"
-    , Test "\"ha\" -5 times" <| S.repeat (0-5) "ha" == ""
+    , Test "\"ha\" -5 times" <| S.repeat -5 "ha" == ""
     ]
   , Describe "append"
     [ Test "blank onto a blank" <| S.append "" "" == ""
@@ -70,8 +70,8 @@ suite =
   , Describe "slice"
     [ Test "7 9 \"snakes on a plane!\"" <| S.slice 7 9 "snakes on a plane!" == "on"
     , Test "0 6 \"snakes on a plane!\"" <| S.slice 0 6 "snakes on a plane!" == "snakes"
-    , Test "0 -7 \"snakes on a plane!\"" <| S.slice 0 (0 - 7) "snakes on a plane!" == "snakes on a"
-    , Test "-6 -1 \"snakes on a plane!\"" <| S.slice (0 - 6) (0 - 1) "snakes on a plane!" == "plane"
+    , Test "0 -7 \"snakes on a plane!\"" <| S.slice 0 -7 "snakes on a plane!" == "snakes on a"
+    , Test "-6 -1 \"snakes on a plane!\"" <| S.slice -6 -1 "snakes on a plane!" == "plane"
     , Test "30 40 \"snakes on a plane!\"" <| S.slice 30 40 "snakes on a plane!" == ""
     , Test "5 2 \"snakes on a plane!\"" <| S.slice 5 2 "snakes on a plane!" == ""
     ]
@@ -79,28 +79,28 @@ suite =
     [ Test "2 \"hello\"" <| S.takeLeft 2 "hello" == "he"
     , Test "5 \"hello\"" <| S.takeLeft 5 "hello" == "hello"
     , Test "10 \"hello\"" <| S.takeLeft 10 "hello" == "hello"
-    , Test "-1 \"hello\"" <| S.takeLeft (0-1) "hello" == ""
+    , Test "-1 \"hello\"" <| S.takeLeft -1 "hello" == ""
     , Test "4 \"\"" <| S.takeLeft 4 "" == ""
     ]
   , Describe "dropLeft"
     [ Test "2 \"hello\"" <| S.dropLeft 2 "hello" == "llo"
     , Test "5 \"hello\"" <| S.dropLeft 5 "hello" == ""
     , Test "10 \"hello\"" <| S.dropLeft 10 "hello" == ""
-    , Test "-1 \"hello\"" <| S.dropLeft (0-1) "hello" == "hello"
+    , Test "-1 \"hello\"" <| S.dropLeft -1 "hello" == "hello"
     , Test "4 \"\"" <| S.dropLeft 4 "" == ""
     ]
   , Describe "takeRight"
     [ Test "2 \"hello\"" <| S.takeRight 2 "hello" == "lo"
     , Test "5 \"hello\"" <| S.takeRight 5 "hello" == "hello"
     , Test "10 \"hello\"" <| S.takeRight 10 "hello" == "hello"
-    , Test "-1 \"hello\"" <| S.takeRight (0-1) "hello" == ""
+    , Test "-1 \"hello\"" <| S.takeRight -1 "hello" == ""
     , Test "4 \"\"" <| S.takeRight 4 "" == ""
     ]
   , Describe "dropRight"
     [ Test "2 \"hello\"" <| S.dropRight 2 "hello" == "hel"
     , Test "5 \"hello\"" <| S.dropRight 5 "hello" == ""
     , Test "10 \"hello\"" <| S.dropRight 10 "hello" == ""
-    , Test "-1 \"hello\"" <| S.dropRight (0-1) "hello" == "hello"
+    , Test "-1 \"hello\"" <| S.dropRight -1 "hello" == "hello"
     , Test "4 \"\"" <| S.dropRight 4 "" == ""
     ]
   , Describe "contains"
@@ -200,7 +200,7 @@ suite =
     , Test "\"\"" <| S.toList "" == []
     ]
     , Describe "fromInt"
-    [ Test "-10" <| S.fromInt (0 - 10) == "-10"
+    [ Test "-10" <| S.fromInt -10 == "-10"
     , Test "0" <| S.fromInt 0 == "0"
     , Test "32" <| S.fromInt 32 == "32"
     ]
@@ -208,7 +208,7 @@ suite =
     [ Test "'a'" <| S.fromChar 'a' == "a"
     ]
     , Describe "toInt"
-    [ Test "\"-10\"" <| S.toInt "-10" == Some (0 - 10)
+    [ Test "\"-10\"" <| S.toInt "-10" == Some -10
     , Test "\"0\"" <| S.toInt "0" == Some 0
     , Test "\"3.2\"" <| S.toInt "3.2" == None
     , Test "\"32b\"" <| S.toInt "32b" == None
