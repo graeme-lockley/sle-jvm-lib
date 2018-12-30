@@ -1,21 +1,21 @@
 # Maybe
 
-This (simple) library is the solution to Tony Hoare's [Billion Dollar Mistake](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare).  `Maybe` can help with optional results, error handling and optional arguments.
+This (simple) library is the solution to Tony Hoare's [Billion Dollar Mistake](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare).  `Option` can be used with optional results, optional arguments and error handling.
 
-`Maybe` is an ADT with a collection of helper and chaining functions.
+There isn't consensus around the name - `Maybe` or `Option` - within the functional community the family of Haskell languages favour `Maybe` whilst the family of Standard ML languages favour `Option`.  See [Option type](https://en.wikipedia.org/wiki/Option_type) for a breakdown of the different names employed by different languages.  SLE uses `Option` for no other reason than it aids explanation and understanding of the ADT and its collection of functions.
 
 ## Definition
 
 ```
-type Maybe a
-    = Nothing
-    | Just a
+type Option a
+    = None
+    | Some a
 ```
 
-A value of type `Maybe a` either contains:
+A value of type `Option a` either contains:
 
-- a value of type `a` represented as `Just a`, or
-- it is empty represented as `Nothing`
+- a value of type `a` represented as `Some a`, or
+- no value which is represented as `None`
 
 
 ## Functions
@@ -25,9 +25,9 @@ A value of type `Maybe a` either contains:
 Provide a default value, turning an optional value into a normal value. This comes in handy when paired with functions like `String.toInt` and `List.head` which gives back a `Maybe`.
 
 ~~~ +SourceFunctions
-withDefault : a -> Maybe a -> a
-withDefault def Nothing = def
-withDefault def (Just value) = value
+withDefault : a -> Option a -> a
+withDefault def None = def
+withDefault def (Some value) = value
 ~~~
 
 The implementation is declarative so the following code really provides a couple of running examples to get a feel for how to use this function.
@@ -43,68 +43,68 @@ withDefault 100 (toInt "42a") == 100
 
 ### <@function name="map"/>
 
-Transform a `Maybe` value with a given function.
+Transform an `Option` value with a given function.
 
 ~~~ +SourceFunctions
-map : (a -> b) -> Maybe a -> Maybe b
-map f Nothing = Nothing
-map f (Just value) = Just <| f value
+map : (a -> b) -> Option a -> Option b
+map f None = None
+map f (Some value) = Some (f value)
 ~~~
 
 The implementation is declarative so the following code provides a couple of running examples how this function is used.
 
 <@example name="map" title="map (\\x -> x + x) (toInt \"42\")">
-map (\x -> x + x) (toInt "42") == Just 84
+map (\x -> x + x) (toInt "42") == Some 84
 </@example>
 
 <@example name="map" title="map (\\x -> x + x) (toInt \"42a\")">
-map (\x -> x + x) (toInt "42a") == Nothing
+map (\x -> x + x) (toInt "42a") == None
 </@example>
 
 
 ### <@function name="andThen"/>
 
-Chain together many computations that may fail. Once one of the computations fail then the remain computations are ignored.
+This function is used to chain together many computations that may fail. Once one of the computations fail then the remaining computations are ignored.
 
 ~~~ +SourceFunctions
-andThen : (a -> Maybe b) -> Maybe a -> Maybe b
-andThen f Nothing = Nothing
-andThen f (Just value) = f value
+andThen : (a -> Option b) -> Option a -> Option b
+andThen f None = None
+andThen f (Some value) = f value
 ~~~
 
-The implementation is extremely simple however it is useful to see how this function can be used to chain computations together.  As illustration consider the use-case where need to parse some input as a month.  
+The implementation is extremely simple however it is useful to see how this function can be used to chain computations together.  As illustration consider the use-case where need to parse some input as a month.
 
 ~~~ +TestHelperFunctions
-parseMonth : String -> Maybe Int
+parseMonth : String -> Option Int
 parseMonth userInput =
     toInt userInput
       |> andThen toValidMonth
 
-toValidMonth : Int -> Maybe Int
+toValidMonth : Int -> Option Int
 toValidMonth month =
     if (1 <= month) && (month <= 12) then
-        Just month
+        Some month
     else
-        Nothing
+        None
 ~~~
 
 We can now combine these functions together.  The following shows when the entered text if indeed a valid month - the "8" is converted into an `Int` and then validated as a valid month.
 
 <@example name="andThen" title="parseMonth \"8\"">
-parseMonth "8" == Just 8
+parseMonth "8" == Some 8
 </@example>
 
 
 The second scenario is when the entered value is "20" - in this case the "20" is converted into an `Int` but the valid month validation fails and returns `Nothing`.
 
 <@example name="andThen" title="parseMonth \"20\"">
-parseMonth "20" == Nothing
+parseMonth "20" == None
 </@example>
 
 The final scenario is when the entered value is "12abc" - in this case integer conversion fails and the `toValidMonth` is not called.
 
 <@example name="andThen" title="parseMonth \"12abc\"">
-parseMonth "12abc" == Nothing
+parseMonth "12abc" == None
 </@example>
 
 
@@ -112,7 +112,7 @@ parseMonth "12abc" == Nothing
 
 In order to kick off the implementation there is a need for some boilerplate code.  The first is the `Maybe` source code:
 
-~~~ Source file="Maybe.sle"
+~~~ Source file="Option.sle"
 export
   [=SourceExports separator="\n  , "]
 
@@ -121,19 +121,19 @@ export
 
 The second piece of boilerplate code is to hold all of the unit tests that are composed as part of this definition:
 
-~~~ TestSuite file="MaybeTest.sle"
+~~~ TestSuite file="OptionTest.sle"
 export
   suite
 
 
 import file:../Test/Unit exposing Suite(..)
 import file:./String exposing toInt
-import file:./Maybe exposing [=SourceExports separator=", "]
+import file:./Option exposing [=SourceExports separator=", "]
 
 [=TestHelperFunctions separator="\n\n"]
 
 suite =
-  Describe "Data.Maybe"
+  Describe "Data.Option"
   [ [=Tests separator="\n    , "]
   ]
 ~~~

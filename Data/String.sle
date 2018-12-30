@@ -54,7 +54,7 @@ length =
   i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.length"
 
 
-at : Int -> String -> Maybe Char
+at : Int -> String -> Option Char
 at =
   i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.at"
 
@@ -218,7 +218,7 @@ cons =
   i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.cons"
 
 
-uncons : String -> Maybe (Tuple Char String)
+uncons : String -> Option (Tuple Char String)
 uncons =
   i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.uncons"
 
@@ -233,7 +233,7 @@ fromChar c =
   cons c ""
 
 
-toInt : String -> Maybe Int
+toInt : String -> Option Int
 toInt =
   i_BuiltinValue "za.co.no9.sle.runtime.StringUtil.toInt"
 

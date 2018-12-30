@@ -25,8 +25,8 @@ suite =
     , Test "5 character string" <| S.length "hello" == 5
     ]
   , Describe "at"
-    [ Test "2 \"\"" <| S.at 0 "" == Nothing
-    , Test "2 \"hello\"" <| S.at 2 "hello" == Just 'l'
+    [ Test "2 \"\"" <| S.at 0 "" == None
+    , Test "2 \"hello\"" <| S.at 2 "hello" == Some 'l'
     ]
   , Describe "reverse"
     [ Test "blank string" <| S.reverse "" == ""
@@ -187,9 +187,9 @@ suite =
     , Test "'a' \"\"" <| S.cons 'a' "" == "a"
     ]
     , Describe "uncons"
-    [ Test "\"\"" <| S.uncons "" == Nothing
-    , Test "\"a\"" <| S.uncons "a" == Just (Tuple 'a' "")
-    , Test "\"hello\"" <| S.uncons "hello" == Just (Tuple 'h' "ello")
+    [ Test "\"\"" <| S.uncons "" == None
+    , Test "\"a\"" <| S.uncons "a" == Some (Tuple 'a' "")
+    , Test "\"hello\"" <| S.uncons "hello" == Some (Tuple 'h' "ello")
     ]
     , Describe "fromList"
     [ Test "['a', 'e', 'i', 'o', 'u']" <| S.fromList ['a', 'e', 'i', 'o', 'u'] == "aeiou"
@@ -208,10 +208,10 @@ suite =
     [ Test "'a'" <| S.fromChar 'a' == "a"
     ]
     , Describe "toInt"
-    [ Test "\"-10\"" <| S.toInt "-10" == Just (0 - 10)
-    , Test "\"0\"" <| S.toInt "0" == Just 0
-    , Test "\"3.2\"" <| S.toInt "3.2" == Nothing
-    , Test "\"32b\"" <| S.toInt "32b" == Nothing
+    [ Test "\"-10\"" <| S.toInt "-10" == Some (0 - 10)
+    , Test "\"0\"" <| S.toInt "0" == Some 0
+    , Test "\"3.2\"" <| S.toInt "3.2" == None
+    , Test "\"32b\"" <| S.toInt "32b" == None
     ]
     , Describe "foldLeft"
     [ Test "Cons [] \"time\"" <| S.foldLeft (\s c -> Cons c s) [] "time" == ['e', 'm', 'i', 't']
