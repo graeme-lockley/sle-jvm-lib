@@ -1,8 +1,10 @@
 export
   foldLeft
 , foldRight
+, map
 , reverse
 , singleton
+, sum
 
 
 singleton : a -> List a
@@ -23,3 +25,15 @@ foldRight f z (Cons x xs) = f x (foldRight f z xs)
 reverse : List a -> List a
 reverse =
   foldLeft (\xs x -> Cons x xs) []
+
+
+map : (a -> b) -> List a -> List b
+map f Nil =
+  Nil
+map f (Cons x xs) =
+  Cons (f x) (map f xs)
+
+
+sum : List Int -> Int
+sum =
+  foldLeft (\a b -> a + b) 0
