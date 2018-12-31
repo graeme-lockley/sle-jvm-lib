@@ -1,0 +1,103 @@
+# Regex
+
+## Definition
+
+~~~ +SourceDefinitions
+type Regex =
+    Regex
+~~~
+
+~~~ +SourceExports weave=False
+Regex
+~~~
+
+
+## Constructor Functions
+
+### <@function name="fromString"/>
+
+~~~ +SourceFunctions
+fromString : String -> Option Regex
+fromString =
+  i_BuiltinValue "za.co.no9.sle.runtime.RegexUtil.fromString"
+~~~
+
+
+### <@function name="never"/>
+
+~~~ +SourceFunctions
+never : Regex
+never =
+  i_BuiltinValue "za.co.no9.sle.runtime.RegexUtil.never"
+~~~
+
+
+## Functions
+
+### <@function name="quote"/>
+
+~~~ +SourceFunctions
+quote : String -> String
+quote =
+  i_BuiltinValue "za.co.no9.sle.runtime.RegexUtil.quote"
+~~~
+
+
+### <@function name="contains"/>
+
+~~~ +SourceFunctions
+contains : Regex -> String -> Bool
+contains =
+  i_BuiltinValue "za.co.no9.sle.runtime.RegexUtil.contains"
+~~~
+
+
+### <@function name="split"/>
+
+~~~ +SourceFunctions
+split : Regex -> String -> List String
+split =
+  i_BuiltinValue "za.co.no9.sle.runtime.RegexUtil.split"
+~~~
+
+
+
+
+## Boilerplate
+
+In order to kick off the implementation there is a need for some boilerplate code.  The first is the `Stream` source code:
+
+~~~ Source file="Regex.sle"
+export
+  [=SourceExports separator="\n  , "]
+
+[=SourceDefinitions separator="\n\n"]
+
+[=SourceFunctions separator="\n\n"]
+~~~
+
+
+<#macro function name>
+${name}
+
+~~~ +SourceExports weave=False
+${name}
+~~~
+
+~~~ +Tests weave=False
+Describe "${name}"
+    [ [=${name}Tests separator="\n    , "]
+    ]
+~~~
+</#macro>
+
+<#macro test name title>
+~~~ ${name}
+Test "${title}" <| <#nested>
+~~~
+</#macro>
+<#macro example name title>
+~~~ haskell
+<#nested>
+~~~
+</#macro>
