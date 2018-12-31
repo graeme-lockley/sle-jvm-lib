@@ -132,7 +132,7 @@ take n stream =
   if n < 1 then
     []
   else
-    (head stream) :: (take (n - 1) (tail stream))
+    head stream :: take (n - 1) (tail stream)
 ~~~
 
 
