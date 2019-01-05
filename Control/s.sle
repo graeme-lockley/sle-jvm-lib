@@ -1,8 +1,13 @@
 export
   main
 
+import file:../Data/List
+import file:../Data/Option
 import file:../Data/String
 import file:./Actor
+
+import file:../Debug as D
+
 
 console =
   Actor.createBuiltin "za.co.no9.sle.runtime.actors.ConsoleActor"
@@ -13,6 +18,73 @@ myActor msg =
   Actor.create (\self -> Tuple () [Actor.cmd console msg]) (\state message -> Tuple state [])
 
 
-main : Actor.Actor String
+statelessCreate : (m -> List Actor.Cmd) -> Actor.Actor m
+statelessCreate f =
+  Actor.create
+    (\self -> Tuple () [])
+    (\state message -> Tuple () (f message))
+
+
+sink : Actor.Actor a
+sink =
+  statelessCreate (\message -> [])
+
+
+mapActor : (a -> b) -> Actor.Actor b -> Actor.Actor a
+mapActor f a =
+  statelessCreate (\message -> [Actor.cmd a (f message)])
+
+
+filterActor : (a -> Bool) -> Actor.Actor a -> Actor.Actor a
+filterActor p a =
+  statelessCreate
+    (\message ->
+      if p message then
+        [Actor.cmd a message]
+      else
+        [])
+
+
+intConsole : Actor.Actor Int
+intConsole =
+  mapActor String.fromInt console
+
+
+mod n m =
+  n - ((n / m) * m)
+
+
+isDivisibleBy1000 n =
+  (mod n 1000) == 0
+
+
+sssActor : () -> Actor.Actor Int
+sssActor () =
+  D.info "sssActor"
+    <| filterActor isDivisibleBy1000
+    <| mapActor String.fromInt
+    <| mapActor (String.append "Value: ")
+    <| sink
+
+
+incActor : Actor.Actor Int -> Int -> Actor.Actor ()
+incActor next initValue =
+  Actor.create
+    (\self -> Tuple (Tuple initValue self) [
+      Actor.cmd self ()
+    ])
+    (\(Tuple state self) message ->
+      if (mod state 100000) == 0 then
+        Tuple (Tuple state self) []
+      else
+        Tuple (Tuple (state + 1) self)
+          [ Actor.cmd next state
+          , Actor.cmd self ()
+          ])
+
+
+main : Int
 main =
-  myActor "Hello World"
+  List.repeat 1 100
+    |> List.map (\v -> incActor (sssActor ()) 1)
+    |> List.length
