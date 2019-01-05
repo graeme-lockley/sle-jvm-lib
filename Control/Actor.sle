@@ -1,0 +1,35 @@
+export
+  Actor
+, Cmd
+, cmd
+, create
+, createBuiltin
+, createBuiltinWithInit
+
+
+type Cmd =
+  Cmd
+
+
+type Actor m =
+  Actor m
+
+
+cmd : Actor m -> m -> Cmd
+cmd =
+  i_BuiltinValue "za.co.no9.sle.runtime.ActorUtil.cmd"
+
+
+create : (Actor m -> Tuple s (List Cmd)) -> (s -> m -> Tuple s (List Cmd)) -> Actor m
+create =
+  i_BuiltinValue "za.co.no9.sle.runtime.ActorUtil.create"
+
+
+createBuiltin : String -> Actor m
+createBuiltin =
+  i_BuiltinValue "za.co.no9.sle.runtime.ActorUtil.createBuiltin"
+
+
+createBuiltinWithInit : String -> (Actor m -> Tuple s (List Cmd)) -> Actor m
+createBuiltinWithInit =
+  i_BuiltinValue "za.co.no9.sle.runtime.ActorUtil.createBuiltinWithInit"
