@@ -1,0 +1,18 @@
+export
+  main
+
+import file:../Data/String
+import file:./Actor
+
+console =
+  Actor.createBuiltin "za.co.no9.sle.runtime.actors.ConsoleActor"
+
+
+myActor : String -> Actor.Actor String
+myActor msg =
+  Actor.create (\self -> Tuple () [Actor.cmd console msg]) (\state message -> Tuple state [])
+
+
+main : Actor.Actor String
+main =
+  myActor "Hello World"
