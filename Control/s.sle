@@ -26,29 +26,9 @@ statelessCreate f =
     (\state message -> Response.msgs (f message))
 
 
-sink : Actor.Actor a
-sink =
-  statelessCreate (\message -> [])
-
-
-mapActor : (a -> b) -> Actor.Actor b -> Actor.Actor a
-mapActor f a =
-  statelessCreate (\message -> [Actor.cmd a (f message)])
-
-
-filterActor : (a -> Bool) -> Actor.Actor a -> Actor.Actor a
-filterActor p a =
-  statelessCreate
-    (\message ->
-      if p message then
-        [Actor.cmd a message]
-      else
-        [])
-
-
 intConsole : Actor.Actor Int
 intConsole =
-  mapActor String.fromInt console
+  Actor.map String.fromInt console
 
 
 mod n m =
@@ -61,10 +41,10 @@ isDivisibleBy1000 n =
 
 sssActor : () -> Actor.Actor Int
 sssActor () =
-    filterActor isDivisibleBy1000
-    <| mapActor String.fromInt
-    <| mapActor (String.append "Value: ")
-    <| console
+    Actor.filter isDivisibleBy1000
+      <| Actor.map String.fromInt
+      <| Actor.map (String.append "Value: ")
+      <| console
 
 
 incActor : Actor.Actor Int -> Int -> Actor.Actor ()

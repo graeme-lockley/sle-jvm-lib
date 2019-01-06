@@ -5,6 +5,9 @@ export
 , create
 , createBuiltin
 , createBuiltinWithInit
+, createStateless
+, filter
+, map
 , Response
 
 
@@ -23,6 +26,11 @@ cmd =
   i_BuiltinValue "za.co.no9.sle.runtime.ActorUtil.cmd"
 
 
+msgs : List Cmd -> Response s
+msgs =
+  i_BuiltinValue "za.co.no9.sle.runtime.ActorUtil.msgs"
+
+
 create : (Actor m -> Tuple s (List Cmd)) -> (s -> m -> Response s) -> Actor m
 create =
   i_BuiltinValue "za.co.no9.sle.runtime.ActorUtil.create"
@@ -36,3 +44,30 @@ createBuiltin =
 createBuiltinWithInit : String -> (Actor m -> Tuple s (List Cmd)) -> Actor m
 createBuiltinWithInit =
   i_BuiltinValue "za.co.no9.sle.runtime.ActorUtil.createBuiltinWithInit"
+
+
+createStateless : (m -> List Cmd) -> Actor m
+createStateless f =
+  create
+    (\self -> Tuple () [])
+    (\state message -> msgs (f message))
+
+
+sink : Actor a
+sink =
+  createStateless (\message -> [])
+
+
+map : (a -> b) -> Actor.Actor b -> Actor.Actor a
+map f a =
+  createStateless (\message -> [cmd a (f message)])
+
+
+filter : (a -> Bool) -> Actor a -> Actor a
+filter p a =
+  createStateless
+    (\message ->
+      if p message then
+        [cmd a message]
+      else
+        [])
