@@ -1,7 +1,9 @@
 export
   foldLeft
 , foldRight
+, length
 , map
+, repeat
 , reverse
 , singleton
 , sum
@@ -37,3 +39,13 @@ map f (Cons x xs) =
 sum : List Int -> Int
 sum =
   foldLeft (\a b -> a + b) 0
+
+
+length : List a -> Int
+length Nil = 0
+length (Cons x xs) = 1 + length xs
+
+
+repeat : a -> Int -> List a
+repeat e 0 = Nil
+repeat e n = Cons e (repeat e (n - 1))
