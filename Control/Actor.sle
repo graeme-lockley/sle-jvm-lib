@@ -5,11 +5,14 @@ export
 , create
 , createBuiltin
 , createBuiltinWithInit
+, Response
 
 
 type Cmd =
   Cmd
 
+type Response s =
+  Response s
 
 type Actor m =
   Actor m
@@ -20,7 +23,7 @@ cmd =
   i_BuiltinValue "za.co.no9.sle.runtime.ActorUtil.cmd"
 
 
-create : (Actor m -> Tuple s (List Cmd)) -> (s -> m -> Tuple s (List Cmd)) -> Actor m
+create : (Actor m -> Tuple s (List Cmd)) -> (s -> m -> Response s) -> Actor m
 create =
   i_BuiltinValue "za.co.no9.sle.runtime.ActorUtil.create"
 
